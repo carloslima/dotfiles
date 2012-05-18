@@ -61,6 +61,7 @@ set list
 set listchars=tab:>-,trail:-
 set mouse=c
 set nowrap
+set number
 set ruler
 set scrolloff=5
 set shiftwidth=4
