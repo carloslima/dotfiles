@@ -88,10 +88,6 @@ highlight   PmenuSel                              ctermbg=7  ctermfg=0
 highlight   PmenuSbar                             ctermbg=0  ctermfg=7
 highlight   PmenuThumb                            ctermbg=7  ctermfg=0
 
-
-" Enable syntax highlight for *.tt as html
-autocmd BufRead,BufNewFile *.tt set filetype=html
-
 " :help last-position-jump
 autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
 
@@ -114,14 +110,3 @@ map <Leader>gg :Git
 nmap <F1> <Esc>
 imap <F1> <Esc>
 
-autocmd BufRead,BufNewFile *.t,*.pl,*.pm,*.cgi,*.PL set equalprg=perltidy
-autocmd BufRead,BufNewFile *.t,*.pl,*.pm,*.cgi,*.PL map <Leader>ur :!su nobody -c "perl  -I/home/git/bom/cgi %"<CR>
-autocmd BufRead,BufNewFile *.t,*.pl,*.pm,*.cgi,*.PL map <Leader>up :!prove -I/home/git/bom/cgi %<CR>
-autocmd BufRead,BufNewFile *.t,*.pl,*.pm,*.cgi,*.PL map <Leader>ud :!perl  -I/home/git/bom/cgi -d %<CR>
-autocmd BufRead,BufNewFile *.t,*.pl,*.pm,*.cgi,*.PL map <Leader>us :!perl /home/git/bom/cgi/t/run_all.pl %<CR>
-autocmd BufRead,BufNewFile *.t,*.pl,*.pm,*.cgi,*.PL map <Leader>uf :!prove /home/git/bom/cgi/t/run_all.pl :: --fast<CR>
-autocmd BufRead,BufNewFile *.t,*.pl,*.pm,*.cgi,*.PL map <Leader>uc :!perl -I/home/git/bom/cgi -I/home/git/bom/t -c %<CR>
-autocmd BufRead,BufNewFile *.t,*.pl,*.pm,*.cgi,*.PL map <Leader>uC :!perlcritic %<CR>
-
-nnoremap <Leader>] :!perl -Ilib %<CR>
-nnoremap <Leader><Leader>] :!perl -d -Ilib %<CR>
