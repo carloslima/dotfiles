@@ -1,0 +1,11 @@
+[user]
+    name = Carlos Lima
+[color]
+    ui = true
+[alias]
+    rebaseme  = rebase --preserve-merges HEAD@{upstream}
+    watch     = log --graph --source --date-order --since='1 week ago' --all
+    watchthis = log --graph --source --date-order --since='1 week ago'
+[core]
+    excludesfile = ~/.gitignore
+
