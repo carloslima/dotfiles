@@ -29,6 +29,7 @@ Bundle 'Lokaltog/vim-powerline'
   let g:Powerline_symbols = 'fancy'
 Bundle 'Lokaltog/vim-easymotion'
 Bundle 'mileszs/ack.vim'
+Bundle 'cakebaker/scss-syntax.vim'
 
 " vim-scripts repos
 "Bundle 'L9'
