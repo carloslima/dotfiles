@@ -30,6 +30,9 @@ Bundle 'Lokaltog/vim-powerline'
 Bundle 'Lokaltog/vim-easymotion'
 Bundle 'mileszs/ack.vim'
 Bundle 'cakebaker/scss-syntax.vim'
+Bundle 'airblade/vim-gitgutter'
+  let g:gitgutter_sign_column_always = 1
+  highlight clear SignColumn
 
 " vim-scripts repos
 "Bundle 'L9'
