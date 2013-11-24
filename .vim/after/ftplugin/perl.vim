@@ -1,3 +1,4 @@
+set shiftwidth=4
 set equalprg=perltidy
 map <Leader>uC :!perlcritic %<CR>
 nnoremap <Leader>] :!perl -Ilib %<CR>

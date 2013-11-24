@@ -69,7 +69,6 @@ set nowrap
 set number
 set ruler
 set scrolloff=5
-set shiftwidth=4
 set showcmd
 set showmatch
 set smarttab
