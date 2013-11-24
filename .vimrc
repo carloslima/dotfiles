@@ -23,7 +23,7 @@ Bundle 'kien/ctrlp.vim'
   let g:ctrlp_working_path_mode = 0 " don’t manage working directory.
   let g:ctrlp_custom_ignore = {
   \ 'dir':  '\v\c\.(git|svn)$|cgi/t/sandbox|cover_db',
-  \ 'file': '\v\c\.(swf|bak|png|gif|js|mov|ico|jpg|pdf|jrxml)$',
+  \ 'file': '\v\c\.(swf|bak|png|gif|mov|ico|jpg|pdf|jrxml)$',
   \ }
 Bundle 'Lokaltog/vim-powerline'
   let g:Powerline_symbols = 'fancy'
