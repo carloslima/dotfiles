@@ -15,6 +15,7 @@ Bundle 'gmarik/vundle'
 " My Bundles here:
 "
 " original repos on github
+Bundle 'matchit.zip'
 Bundle 'tpope/vim-fugitive'
 Bundle 'c9s/perlomni.vim'
 Bundle 'kien/ctrlp.vim'
@@ -33,6 +34,9 @@ Bundle 'cakebaker/scss-syntax.vim'
 Bundle 'airblade/vim-gitgutter'
   let g:gitgutter_sign_column_always = 1
   highlight clear SignColumn
+Bundle 'vim-ruby/vim-ruby'
+Bundle 'kana/vim-textobj-user'
+Bundle 'nelstrom/vim-textobj-rubyblock'
 
 " vim-scripts repos
 "Bundle 'L9'
