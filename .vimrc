@@ -118,3 +118,4 @@ map <Leader>gg :Git
 nmap <F1> <Esc>
 imap <F1> <Esc>
 
+autocmd FileType gitcommit autocmd! BufEnter COMMIT_EDITMSG call setpos('.', [0, 1, 1, 0])
