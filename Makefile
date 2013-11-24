@@ -13,3 +13,9 @@ no-dirty:
 	git diff-index --quiet HEAD || { echo 'git repository has uncommitted changes'; false; }
 no-untracked:
 	git ls-files --others --exclude-standard --error-unmatch . 2>/dev/null; [ $$? -eq 1 ] || { echo 'git repository has untracked files'; false; }
+
+vim:
+	mv -n ~/.vimrc ~/.vimrc.old
+	mv -n ~/.vim ~/.vim.old
+	ln -s $$PWD/.vim ~/
+	ln -s $$PWD/.vimrc ~/
