@@ -1,8 +1,6 @@
 set shiftwidth=4
 set equalprg=perltidy
 map <Leader>uC :!perlcritic %<CR>
-nnoremap <Leader>] :!perl -Ilib %<CR>
-nnoremap <Leader><Leader>] :!perl -d -Ilib %<CR>
 
 " too-environment-especific and wrong. pretend you didn't see this.
 map <Leader>ur :!su nobody -c "perl  -I/home/git/bom/cgi %"<CR>
