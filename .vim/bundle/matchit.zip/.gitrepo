@@ -1,0 +1,11 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/vim-scripts/matchit.zip.git
+	branch = master
+	commit = ced6c409c9beeb0b4142d21906606bd194411d1d
+	parent = 7fdb7028eed72313aeb758ac3bb3a56c9a87dfcc
+	cmdver = 0.1.0
