@@ -1,0 +1,11 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/airblade/vim-gitgutter.git
+	branch = master
+	commit = 7908defa0c13f49ce1af7fe32736037a3c9e7dd8
+	parent = 24335310da057cbaac6e5d77404251e68ecdb781
+	cmdver = 0.1.0
