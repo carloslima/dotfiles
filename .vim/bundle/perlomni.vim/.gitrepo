@@ -1,0 +1,11 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/c9s/perlomni.vim.git
+	branch = master
+	commit = 60b39ac6cd59ff14022fc024f1f0a7121a93c952
+	parent = 4298cb24ac05041956f81fc751509ae54c765730
+	cmdver = 0.1.0
