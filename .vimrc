@@ -10,15 +10,15 @@ call vundle#rc()
 
 " let Vundle manage Vundle
 " required! 
-Bundle 'gmarik/vundle'
+Plugin 'gmarik/vundle'
 
 " My Bundles here:
 "
 " original repos on github
-Bundle 'matchit.zip'
-Bundle 'tpope/vim-fugitive'
-Bundle 'c9s/perlomni.vim'
-Bundle 'kien/ctrlp.vim'
+Plugin 'matchit.zip'
+Plugin 'tpope/vim-fugitive'
+Plugin 'c9s/perlomni.vim'
+Plugin 'kien/ctrlp.vim'
   map <Leader>t :CtrlPBuffer<CR>
   let g:ctrlp_map = '<C-t>'
   let g:ctrlp_working_path_mode = 0 " don’t manage working directory.
@@ -26,17 +26,17 @@ Bundle 'kien/ctrlp.vim'
   \ 'dir':  '\v\c\.(git|svn)$|cgi/t/sandbox|cover_db',
   \ 'file': '\v\c\.(swf|bak|png|gif|mov|ico|jpg|pdf|jrxml)$',
   \ }
-Bundle 'Lokaltog/vim-powerline'
+Plugin 'Lokaltog/vim-powerline'
   let g:Powerline_symbols = 'fancy'
-Bundle 'Lokaltog/vim-easymotion'
-Bundle 'mileszs/ack.vim'
-Bundle 'cakebaker/scss-syntax.vim'
-Bundle 'airblade/vim-gitgutter'
+Plugin 'Lokaltog/vim-easymotion'
+Plugin 'mileszs/ack.vim'
+Plugin 'cakebaker/scss-syntax.vim'
+Plugin 'airblade/vim-gitgutter'
   let g:gitgutter_sign_column_always = 1
   highlight clear SignColumn
-Bundle 'vim-ruby/vim-ruby'
-Bundle 'kana/vim-textobj-user'
-Bundle 'nelstrom/vim-textobj-rubyblock'
+Plugin 'vim-ruby/vim-ruby'
+Plugin 'kana/vim-textobj-user'
+Plugin 'nelstrom/vim-textobj-rubyblock'
 
 " vim-scripts repos
 "Bundle 'L9'
