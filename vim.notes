@@ -28,3 +28,15 @@ H / M / L -> Jump to top / middle / bottom of screen
 zt / zz / zb -> redraw with cursor at top / center / bottom
 C-E / C-Y -> scroll up / down (without moving cursor)
 Revisit plugin: surround.vim
+
+registers:
+"" unnamed (default)
+"0 yank
+"_ black hole
+"+ clipboard
+"* mouse selection
+
+
+gp & gP: same as p & P but leaves cursor at end of pasted text
+
+%s///gn  count the matches for the current pattern
