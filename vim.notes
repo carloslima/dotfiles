@@ -1,0 +1,30 @@
+q: -> Command Line History
+q/ -> Search History
+ctrl+f -> Command Line to Command Line History window
+
+C-N / C-P on : and / modes (instead of up/down)
+%:h -> expands to current file's directory
+:w !sudo tee %
+
+W / B / E / gE: WORDS
+
+, -> reverse of ;
+
+t -> 'tag'  <b>value</b>
+s -> 'sentence'
+p -> 'paragraph'
+
+
+mm `m -> create mark m, jump to it.
+`. -> last change
+`^ -> last insertion
+`[ -> start of last change or yank
+`] -> end of last change or yank
+`< -> start of last visual selection
+`> -> end of last visual selection
+`` -> position before last jump
+
+H / M / L -> Jump to top / middle / bottom of screen
+zt / zz / zb -> redraw with cursor at top / center / bottom
+C-E / C-Y -> scroll up / down (without moving cursor)
+Revisit plugin: surround.vim

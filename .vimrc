@@ -99,10 +99,15 @@ highlight   PmenuThumb                            ctermbg=7  ctermfg=0
 " :help last-position-jump
 autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
 
+inoremap <C-S> <ESC>:update<CR>a
+nnoremap <C-S> :update<CR>
 nnoremap <C-L> :noh<CR><C-L>
 inoremap jj <Esc>
 nnoremap <Leader>r :source ~/.vimrc<CR>
 nnoremap <Leader><Leader>r :e ~/.vimrc<CR>
+" Ctrl P/N on Command Line mode (with filtering)
+cnoremap <C-N> <DOWN>
+cnoremap <C-P> <UP>
 
 map <Leader>gs :Gstatus<CR>
 map <Leader>gc :Gcommit<CR>
