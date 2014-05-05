@@ -23,7 +23,7 @@ Plugin 'kien/ctrlp.vim'
   let g:ctrlp_map = '<C-t>'
   let g:ctrlp_working_path_mode = 0 " don’t manage working directory.
   let g:ctrlp_custom_ignore = {
-  \ 'dir':  '\v\c\.(git|svn)$|cgi/t/sandbox|cover_db',
+  \ 'dir':  '\v\c\.(git|svn)$|cover_db|vendor/',
   \ 'file': '\v\c\.(swf|bak|png|gif|mov|ico|jpg|pdf|jrxml)$',
   \ }
 Plugin 'Lokaltog/vim-powerline'
@@ -37,6 +37,8 @@ Plugin 'airblade/vim-gitgutter'
 Plugin 'vim-ruby/vim-ruby'
 Plugin 'kana/vim-textobj-user'
 Plugin 'nelstrom/vim-textobj-rubyblock'
+Plugin 'tpope/vim-markdown'
+Plugin 'rodjek/vim-puppet'
 
 " vim-scripts repos
 "Bundle 'L9'
@@ -73,6 +75,7 @@ set nowrap
 set number
 set ruler
 set scrolloff=5
+set shiftwidth=4
 set showcmd
 set showmatch
 set smarttab
@@ -103,6 +106,7 @@ inoremap <C-S> <ESC>:update<CR>a
 nnoremap <C-S> :update<CR>
 nnoremap <C-L> :noh<CR><C-L>
 inoremap jj <Esc>
+
 nnoremap <Leader>r :source ~/.vimrc<CR>
 nnoremap <Leader><Leader>r :e ~/.vimrc<CR>
 " Ctrl P/N on Command Line mode (with filtering)
