@@ -39,6 +39,7 @@ Plugin 'kana/vim-textobj-user'
 Plugin 'nelstrom/vim-textobj-rubyblock'
 Plugin 'tpope/vim-markdown'
 Plugin 'rodjek/vim-puppet'
+Plugin 'kana/vim-textobj-lastpat'
 
 " vim-scripts repos
 "Bundle 'L9'
