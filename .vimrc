@@ -73,6 +73,7 @@ set list
 set listchars=tab:>-,trail:-
 set mouse=c
 set nowrap
+set nrformats=
 set number
 set ruler
 set scrolloff=5
@@ -107,6 +108,7 @@ inoremap <C-S> <ESC>:update<CR>a
 nnoremap <C-S> :update<CR>
 nnoremap <C-L> :noh<CR><C-L>
 inoremap jj <Esc>
+nnoremap <Leader><Leader>t :ClearAllCtrlPCaches<CR>
 
 nnoremap <Leader>r :source ~/.vimrc<CR>
 nnoremap <Leader><Leader>r :e ~/.vimrc<CR>
