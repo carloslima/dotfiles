@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Exec=/usr/bin/gnome-screensaver
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+Name=Gnome Screensaver
+Comment=Gnome Screensaver Daemon
