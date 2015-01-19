@@ -90,6 +90,7 @@ syntax on
 
 highlight   CursorColumn  term=NONE    cterm=none ctermbg=232
 highlight   CursorLine    term=NONE    cterm=bold ctermbg=8
+highlight   ColorColumn   term=NONE    cterm=bold ctermbg=1
 highlight   FoldColumn                            ctermbg=8  ctermfg=14
 highlight   Folded                                ctermbg=8  ctermfg=14
 highlight   Search        term=reverse cterm=bold ctermbg=11 ctermfg=0
@@ -133,3 +134,5 @@ nmap <F1> <Esc>
 imap <F1> <Esc>
 
 autocmd FileType gitcommit autocmd! BufEnter COMMIT_EDITMSG call setpos('.', [0, 1, 1, 0])
+
+set colorcolumn=100,120
