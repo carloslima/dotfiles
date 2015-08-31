@@ -137,3 +137,9 @@ imap <F1> <Esc>
 autocmd FileType gitcommit autocmd! BufEnter COMMIT_EDITMSG call setpos('.', [0, 1, 1, 0])
 
 set colorcolumn=100,120
+
+if match($TERM, "screen-256color")!=-1
+  set term=xterm-256color
+elseif match($TERM, "screen")!=-1
+  set term=xterm
+endif
