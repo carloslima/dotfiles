@@ -1,15 +1,21 @@
-import XMonad
-import XMonad.Hooks.DynamicLog
-import XMonad.Hooks.ManageHelpers
-import XMonad.Layout.NoBorders
-import qualified XMonad.StackSet as W
-import XMonad.Util.EZConfig
+{-# LANGUAGE OverloadedStrings #-}
 
 import Codec.Binary.UTF8.String
+import qualified Codec.Binary.UTF8.String as UTF8
 import Data.Monoid
+import qualified DBus as D
+import qualified DBus.Client as D
+import XMonad
 import XMonad.Actions.GridSelect
+import XMonad.Hooks.DynamicLog
+import XMonad.Hooks.EwmhDesktops
+import XMonad.Hooks.ManageHelpers
+import XMonad.Layout.NoBorders
+import XMonad.Layout.ToggleLayouts
 import XMonad.Prompt
 import XMonad.Prompt.Window
+import qualified XMonad.StackSet as W
+import XMonad.Util.EZConfig
 
 import XMonad.Config.Desktop
 import XMonad.Util.Run (safeSpawn)
@@ -53,16 +59,22 @@ gnomeRegister = io $ do
 
 main :: IO ()
 main = do
-    xmonad $ gnomeConfig
+    dbus <- D.connectSession
+    getWellKnownName dbus
+    xmonad $ ewmh gnomeConfig
          { modMask = mod4Mask
          , borderWidth = 2
          , terminal = "gnome-terminal"
-         , layoutHook = smartBorders $ layoutHook gnomeConfig
+         , layoutHook = smartBorders $ toggleLayouts Full $ layoutHook gnomeConfig
          , workspaces = myWorkspaces
          , focusFollowsMouse = False
+         , logHook = dynamicLogWithPP (prettyPrinter dbus)
+         , handleEventHook = fullscreenEventHook
          , manageHook = composeAll
              [ manageHook gnomeConfig
-             -- , isFullscreen --> doFullFloat
+             , title =? "Whisker Menu" --> doRectFloat  (W.RationalRect 0.0 0.0 0.4 0.95)
+             , isFullscreen --> doFullFloat
+             , isDialog --> doCenterFloat
              -- , title =? "VLC (XVideo output)" --> doFullFloat
              -- , title =? "Contact List" --> doFullFloat
              -- , className =? "Gcalctool" --> doCenterFloat
@@ -78,13 +90,15 @@ fullFloatFocused =
     withFocused $ \f -> windows =<< appEndo `fmap` runQuery doFullFloat f
 
 
-myWorkspaces = ["`","1","2","3","4","5","6","7","8","9","0","-","="]
+myWorkspaces = ["`","1","2","3","4","5","6","7","8","9","0","-","=","[","]","\\"]
 
 myKeys =
     [
       ("M-x",    spawn "~/bin/display_fix")
     , ("M-z",    spawn "xflock4")
     , ("C-M1-l", spawn "xflock4")
+    , ("C-M1-k", fullFloatFocused)
+    , ("M-f", sendMessage (Toggle "Full"))
 
 --    , ("<XF86MonBrightnessUp>",  spawn "xbacklight -inc 5")
 --    , ("<XF86MonBrightnesDown>", spawn "xbacklight -dec 5")
@@ -106,20 +120,65 @@ myKeys =
     , ("M-S-<Page_Down>", spawn "dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Next")
 
 
-    , ("M1-<Tab>", goToSelected defaultGSConfig)
+    -- , ("M1-<Tab>", goToSelected defaultGSConfig)
+    , ("M1-<Tab>", spawn "rofi -show window")
     , ("M-<F7>", windowPromptGoto  defaultXPConfig)
     , ("M-<F8>", windowPromptBring defaultXPConfig)
     , ("M-<F9>", windowPromptGoto  defaultXPConfig { autoComplete = Just 500000 } )
     ]
     ++
     [ (otherModMasks ++ "M-" ++ [key], action tag)
-         | (tag, key)  <- zip myWorkspaces "`1234567890-="
+         | (tag, key)  <- zip myWorkspaces "`1234567890-=[]\\"
          , (otherModMasks, action) <- [ ("", windows . W.greedyView) -- W.greedyView / W.view
                                       , ("S-", windows . W.shift)]
     ]
     ++
     [ (otherModMasks ++ "M-" ++ [key], screenWorkspace screen >>= flip whenJust (windows . action))
-        | (key, screen) <- zip "uio" [2,1,0]  -- standing desk
+        | (key, screen) <- zip "ui" [0,1]
+        -- | (key, screen) <- zip "ui" [1,0]
+        -- | (key, screen) <- zip "uio" [1,0,0]
         -- | (key, screen) <- zip "uio" [1,0,2]  -- sitting
         -- | (key, screen) <- zip "yuio" [1,0,1,2]  -- mixed mess :-)
         , (otherModMasks, action) <- [("", W.view), ("S-", W.shift)]]
+
+
+prettyPrinter :: D.Client -> PP
+prettyPrinter dbus = defaultPP
+    { ppOutput   = dbusOutput dbus
+    , ppTitle    = pangoSanitize
+    , ppCurrent  = pangoColor "blue" . wrap "[" "]" . pangoSanitize
+    , ppVisible  = pangoColor "green" . wrap "(" ")" . pangoSanitize
+    , ppHidden   = const ""
+    , ppUrgent   = pangoColor "red"
+    , ppLayout   = const ""
+    , ppSep      = " "
+    }
+
+getWellKnownName :: D.Client -> IO ()
+getWellKnownName dbus = do
+  D.requestName dbus (D.busName_ "org.xmonad.Log")
+                [D.nameAllowReplacement, D.nameReplaceExisting, D.nameDoNotQueue]
+  return ()
+  
+dbusOutput :: D.Client -> String -> IO ()
+dbusOutput dbus str = do
+    let signal = (D.signal "/org/xmonad/Log" "org.xmonad.Log" "Update") {
+            D.signalBody = [D.toVariant ("<b>" ++ (UTF8.decodeString str) ++ "</b>")]
+        }
+    D.emit dbus signal
+
+pangoColor :: String -> String -> String
+pangoColor fg = wrap left right
+  where
+    left  = "<span foreground=\"" ++ fg ++ "\">"
+    right = "</span>"
+
+pangoSanitize :: String -> String
+pangoSanitize = foldr sanitize ""
+  where
+    sanitize '>'  xs = "&gt;" ++ xs
+    sanitize '<'  xs = "&lt;" ++ xs
+    sanitize '\"' xs = "&quot;" ++ xs
+    sanitize '&'  xs = "&amp;" ++ xs
+    sanitize x    xs = x:xs
+
