@@ -18,7 +18,7 @@ Plugin 'gmarik/vundle'
 " original repos on github
 Plugin 'matchit.zip'
 Plugin 'tpope/vim-fugitive'
-Plugin 'kien/ctrlp.vim'
+Plugin 'ctrlpvim/ctrlp.vim'
   map <Leader>t :CtrlPBuffer<CR>
   let g:ctrlp_map = '<C-t>'
   let g:ctrlp_working_path_mode = 0 " don’t manage working directory.
