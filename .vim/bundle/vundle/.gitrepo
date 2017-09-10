@@ -6,6 +6,6 @@
 [subrepo]
 	remote = https://github.com/gmarik/vundle.git
 	branch = master
-	commit = 8db3bcb5921103f0eb6de361c8b25cc03cb350b5
-	parent = 85b27d26b41673433364e946a4f1eae932bc9e49
-	cmdver = 0.1.0
+	commit = 6437ad6df4a3e6a87c5fb8bd2b8aadb277ec9c87
+	parent = f4213bd6ec2cbf97b510f28c4673e42c52ea3173
+	cmdver = 0.3.1
