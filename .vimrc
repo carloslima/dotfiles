@@ -27,7 +27,18 @@ Plugin 'ctrlpvim/ctrlp.vim'
   \ 'file': '\v\c\.(swf|bak|png|gif|mov|ico|jpg|pdf|jrxml)$',
   \ }
 Plugin 'vim-airline/vim-airline'
-  let g:Powerline_symbols = 'fancy'
+  let g:airline_powerline_fonts = 1
+  if !exists('g:airline_symbols')
+      let g:airline_symbols = {}
+  endif
+  let g:airline_left_sep = '⮀'
+  let g:airline_left_alt_sep = '⮁'
+  let g:airline_right_sep = '⮂'
+  let g:airline_right_alt_sep = '⮃'
+  let g:airline_symbols.branch = '⭠'
+  "let g:airline_symbols.branch = '⎇ '
+  let g:airline_symbols.readonly = '⭤'
+  let g:airline_symbols.linenr = '⭡'
 Plugin 'easymotion/vim-easymotion'
 Plugin 'airblade/vim-gitgutter'
   set signcolumn=yes
