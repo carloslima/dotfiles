@@ -1,0 +1,11 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/kana/vim-textobj-lastpat
+	branch = master
+	commit = 686aa837e3aa649b16572d5d55eb2d8c7fc6c78a
+	parent = b9fe2be54ff2a23933b31a8a68ee52c6ef31c745
+	cmdver = 0.3.1
