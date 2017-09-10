@@ -26,7 +26,7 @@ Plugin 'ctrlpvim/ctrlp.vim'
   \ 'dir':  '\v\c\.(git|svn)$|cover_db|vendor/',
   \ 'file': '\v\c\.(swf|bak|png|gif|mov|ico|jpg|pdf|jrxml)$',
   \ }
-Plugin 'Lokaltog/vim-powerline'
+Plugin 'powerline/powerline'
   let g:Powerline_symbols = 'fancy'
 Plugin 'easymotion/vim-easymotion'
 Plugin 'airblade/vim-gitgutter'
