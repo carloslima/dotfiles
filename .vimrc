@@ -30,7 +30,7 @@ Plugin 'Lokaltog/vim-powerline'
   let g:Powerline_symbols = 'fancy'
 Plugin 'easymotion/vim-easymotion'
 Plugin 'airblade/vim-gitgutter'
-  let g:gitgutter_sign_column_always = 1
+  set signcolumn=yes
   highlight clear SignColumn
 Plugin 'vim-ruby/vim-ruby'
 Plugin 'kana/vim-textobj-user'
