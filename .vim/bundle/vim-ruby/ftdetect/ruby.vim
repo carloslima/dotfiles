@@ -1,62 +1,42 @@
+" Officially distributed filetypes
+
+" Support functions {{{
+function! s:setf(filetype) abort
+  if &filetype !~# '\<'.a:filetype.'\>'
+    let &filetype = a:filetype
+  endif
+endfunction
+
+func! s:StarSetf(ft)
+  if expand("<amatch>") !~ g:ft_ignore_pat
+    exe 'setf ' . a:ft
+  endif
+endfunc
+" }}}
+
+" HTML with Ruby - eRuby
+au BufNewFile,BufRead *.erb,*.rhtml				call s:setf('eruby')
+
+" Interactive Ruby shell
+au BufNewFile,BufRead .irbrc,irbrc				call s:setf('ruby')
+
 " Ruby
-au BufNewFile,BufRead *.rb,*.rbw,*.gemspec	set filetype=ruby
-
-" Ruby on Rails
-au BufNewFile,BufRead *.builder,*.rxml,*.rjs	set filetype=ruby
-
-" Rakefile
-au BufNewFile,BufRead [rR]akefile,*.rake	set filetype=ruby
-
-" Rantfile
-au BufNewFile,BufRead [rR]antfile,*.rant	set filetype=ruby
-
-" IRB config
-au BufNewFile,BufRead .irbrc,irbrc		set filetype=ruby
-
-" Pry config
-au BufNewFile,BufRead .pryrc			set filetype=ruby
+au BufNewFile,BufRead *.rb,*.rbw,*.gemspec			call s:setf('ruby')
 
 " Rackup
-au BufNewFile,BufRead *.ru			set filetype=ruby
-
-" Capistrano
-au BufNewFile,BufRead Capfile			set filetype=ruby
+au BufNewFile,BufRead *.ru					call s:setf('ruby')
 
 " Bundler
-au BufNewFile,BufRead Gemfile			set filetype=ruby
+au BufNewFile,BufRead Gemfile					call s:setf('ruby')
 
-" Guard
-au BufNewFile,BufRead Guardfile,.Guardfile	set filetype=ruby
+" Ruby on Rails
+au BufNewFile,BufRead *.builder,*.rxml,*.rjs,*.ruby		call s:setf('ruby')
 
-" Chef
-au BufNewFile,BufRead Cheffile			set filetype=ruby
-au BufNewFile,BufRead Berksfile			set filetype=ruby
+" Rakefile
+au BufNewFile,BufRead [rR]akefile,*.rake			call s:setf('ruby')
+au BufNewFile,BufRead [rR]akefile*				call s:StarSetf('ruby')
 
-" Vagrant
-au BufNewFile,BufRead [vV]agrantfile		set filetype=ruby
+" Rantfile
+au BufNewFile,BufRead [rR]antfile,*.rant			call s:setf('ruby')
 
-" Autotest
-au BufNewFile,BufRead .autotest			set filetype=ruby
-
-" eRuby
-au BufNewFile,BufRead *.erb,*.rhtml		set filetype=eruby
-
-" Thor
-au BufNewFile,BufRead [tT]horfile,*.thor	set filetype=ruby
-
-" Rabl
-au BufNewFile,BufRead *.rabl			set filetype=ruby
-
-" Jbuilder
-au BufNewFile,BufRead *.jbuilder		set filetype=ruby
-
-" Puppet librarian
-au BufNewFile,BufRead Puppetfile		set filetype=ruby
-"
-" Buildr Buildfile
-au BufNewFile,BufRead [Bb]uildfile		set filetype=ruby
-
-" Appraisal
-au BufNewFile,BufRead Appraisals		set filetype=ruby
-
-" vim: nowrap sw=2 sts=2 ts=8 noet:
+" vim: nowrap sw=2 sts=2 ts=8 noet fdm=marker:

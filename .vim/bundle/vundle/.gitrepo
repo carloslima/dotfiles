@@ -1,0 +1,11 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/gmarik/vundle.git
+	branch = master
+	commit = 6437ad6df4a3e6a87c5fb8bd2b8aadb277ec9c87
+	parent = f4213bd6ec2cbf97b510f28c4673e42c52ea3173
+	cmdver = 0.3.1

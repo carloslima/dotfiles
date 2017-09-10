@@ -1,0 +1,11 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/vim-ruby/vim-ruby.git
+	branch = master
+	commit = 074200ffa39b19baf9d9750d399d53d97f21ee07
+	parent = 9be8a490bd885314bf839975e9a9205b618e596f
+	cmdver = 0.3.1

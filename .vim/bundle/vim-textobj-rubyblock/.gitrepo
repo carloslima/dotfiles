@@ -1,0 +1,11 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/nelstrom/vim-textobj-rubyblock
+	branch = master
+	commit = 2b882e2cc2599078f75e6e88cd268192bf7b27bf
+	parent = c22f9e92dd0dcf8d36c8681983ee525a71c05af8
+	cmdver = 0.3.1

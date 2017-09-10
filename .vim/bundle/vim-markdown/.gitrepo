@@ -1,0 +1,11 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/tpope/vim-markdown.git
+	branch = master
+	commit = a7dbc314569aa85db80c106d73b1664e385b6ae7
+	parent = 86b8021c86bb494d2f73c4b14455989ba3ac54ec
+	cmdver = 0.3.1

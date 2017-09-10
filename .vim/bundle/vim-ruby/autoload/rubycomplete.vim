@@ -196,7 +196,7 @@ function! rubycomplete#Complete(findstart, base)
             if c =~ '\w'
                 continue
             elseif ! c =~ '\.'
-                idx = -1
+                let idx = -1
                 break
             else
                 break
@@ -587,11 +587,13 @@ class VimRubyCompletion
 # {{{ main completion code
   def self.preload_rails
     a = VimRubyCompletion.new
-    require 'Thread'
-    Thread.new(a) do |b|
-      begin
-      b.load_rails
-      rescue
+    if VIM::evaluate("has('nvim')") == 0
+      require 'thread'
+      Thread.new(a) do |b|
+        begin
+        b.load_rails
+        rescue
+        end
       end
     end
     a.load_rails
@@ -704,7 +706,9 @@ class VimRubyCompletion
         cv = eval("self.class.constants")
         vartype = get_var_type( receiver )
         dprint "vartype: %s" % vartype
-        if vartype != ''
+
+        invalid_vartype = ['', "gets"]
+        if !invalid_vartype.include?(vartype)
           load_buffer_class( vartype )
 
           begin
@@ -732,7 +736,7 @@ class VimRubyCompletion
             methods.concat m.instance_methods(false)
           }
         end
-        variables += add_rails_columns( "#{vartype}" ) if vartype && vartype.length > 0
+        variables += add_rails_columns( "#{vartype}" ) if vartype && !invalid_vartype.include?(vartype)
 
       when /^\(?\s*[A-Za-z0-9:^@.%\/+*\(\)]+\.\.\.?[A-Za-z0-9:^@.%\/+*\(\)]+\s*\)?\.([^.]*)/
         message = $1

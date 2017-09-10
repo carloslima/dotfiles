@@ -1,6 +1,6 @@
-" textobj-user - Support for user-defined text objects
-" Version: 0.4.1
-" Copyright (C) 2007-2013 Kana Natsuno <http://whileimautomaton.net/>
+" textobj-user - Create your own text objects
+" Version: 0.7.2
+" Copyright (C) 2007-2015 Kana Natsuno <http://whileimautomaton.net/>
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -25,9 +25,9 @@
 " simple  "{{{2
 
 function! textobj#user#move(pattern, flags, previous_mode)
-  call s:prepare_movement(a:previous_mode)
-
   let i = v:count1
+
+  call s:prepare_movement(a:previous_mode)
   while 0 < i
     let result = searchpos(a:pattern, a:flags.'W')
     let i = i - 1
@@ -38,33 +38,51 @@ endfunction
 
 " FIXME: growing the current selection like iw/aw, is/as, and others.
 " FIXME: countable.
-" FIXME: In a case of a:pattern matches with one character.
 function! textobj#user#select(pattern, flags, previous_mode)
-  call s:prepare_selection(a:previous_mode)
   let ORIG_POS = s:gpos_to_spos(getpos('.'))
 
-  let posf_tail = searchpos(a:pattern, 'ceW')
-  let posf_head = searchpos(a:pattern, 'bW')
+  let pft = searchpos(a:pattern, 'ceW')
+  let pfh = searchpos(a:pattern, 'bcW')
   call cursor(ORIG_POS)
-  let posb_head = searchpos(a:pattern, 'bcW')
-  let posb_tail = searchpos(a:pattern, 'eW')
+  let pbh = searchpos(a:pattern, 'bcW')
+  let pbt = searchpos(a:pattern, 'ceW')
+  let pos = s:choose_better_pos(a:flags, ORIG_POS, pfh, pft, pbh, pbt)
 
-  " search() family with 'c' flag may not be matched to a pattern which
-  " matches to multiple lines.  To choose appropriate range, we have to check
-  " another range whether it contains the cursor or not.
-  if (a:flags =~# 'b'
-  \   || (s:range_containsp(posb_head, posb_tail, ORIG_POS)
-  \       && s:range_validp(posb_head, posb_tail)))
-    let [pos_head, pos_tail] = [posb_head, posb_tail]
-  else
-    let [pos_head, pos_tail] = [posf_head, posf_tail]
-  endif
-
-  if s:range_validp(pos_head, pos_tail)
-    call s:range_select(pos_head, pos_tail, 'v')
-    return [pos_head, pos_tail]
+  if pos isnot 0
+    if a:flags !~# 'N'
+      call s:range_select(pos[0], pos[1], s:choose_wise(a:flags))
+    endif
+    return pos
   else
     return s:cancel_selection(a:previous_mode, ORIG_POS)
+  endif
+endfunction
+
+function! s:choose_better_pos(flags, ORIG_POS, pfh, pft, pbh, pbt)
+  " search() family with 'c' flag may not be matched to a pattern which
+  " matches to multiple lines.  To choose appropriate range, we have to check
+  " another range [X] whether it contains the cursor or not.
+  let vf = s:range_validp(a:pfh, a:pft)
+  let vb = s:range_validp(a:pbh, a:pbt)
+  let cf = vf && s:range_containsp(a:pfh, a:pft, a:ORIG_POS)
+  let cb = vb && s:range_containsp(a:pbh, a:pbt, a:ORIG_POS)
+  let lf = vf && s:range_in_linep(a:pfh, a:pft, a:ORIG_POS)
+  let lb = vb && s:range_in_linep(a:pbh, a:pbt, a:ORIG_POS)
+
+  if cb  " [X]
+    return [a:pbh, a:pbt]
+  elseif cf
+    return [a:pfh, a:pft]
+  elseif lf && a:flags =~# '[nl]'
+    return [a:pfh, a:pft]
+  elseif lb && a:flags =~# '[nl]'
+    return [a:pbh, a:pbt]
+  elseif vf && (a:flags =~# '[fn]' || a:flags !~# '[bcl]')
+    return [a:pfh, a:pft]
+  elseif vb && a:flags =~# '[bn]'
+    return [a:pbh, a:pbt]
+  else
+    return 0
   endif
 endfunction
 
@@ -80,7 +98,6 @@ endfunction
 
 " BUGS: With o_CTRL-V, this may not work properly.
 function! textobj#user#select_pair(pattern1, pattern2, flags, previous_mode)
-  call s:prepare_selection(a:previous_mode)
   let ORIG_POS = s:gpos_to_spos(getpos('.'))
 
   " adjust the cursor to the head of a:pattern2 if it's already in the range.
@@ -114,7 +131,7 @@ function! textobj#user#select_pair(pattern1, pattern2, flags, previous_mode)
     if s:range_no_text_without_edgesp(pos1p_tail, pos2p_head)
       return s:cancel_selection(a:previous_mode, ORIG_POS)
     endif
-    call s:range_select(pos1p_tail, pos2p_head, 'v')
+    call s:range_select(pos1p_tail, pos2p_head, s:choose_wise(a:flags))
 
     " adjust the range.
     let whichwrap_orig = &whichwrap
@@ -122,7 +139,7 @@ function! textobj#user#select_pair(pattern1, pattern2, flags, previous_mode)
     execute "normal! \<Left>o\<Right>"
     let &whichwrap = whichwrap_orig
   else
-    call s:range_select(pos1p_head, pos2p_tail, 'v')
+    call s:range_select(pos1p_head, pos2p_tail, s:choose_wise(a:flags))
   endif
   return
 endfunction
@@ -176,6 +193,41 @@ function! textobj#user#define(pat0, pat1, pat2, guideline)  "{{{2
       endif
     endfor
   endfor
+endfunction
+
+
+
+
+function! textobj#user#map(plugin_name, obj_specs, ...)  "{{{2
+  if a:0 == 0
+    " It seems to be directly called by user - a:obj_specs are not normalized.
+    call s:normalize(a:obj_specs)
+  endif
+  let banged_p = a:0 == 0 || a:1
+  for [obj_name, specs] in items(a:obj_specs)
+    for [spec_name, spec_info] in items(specs)
+      let rhs = s:interface_mapping_name(a:plugin_name, obj_name, spec_name)
+      if s:is_non_ui_property_name(spec_name)
+        " ignore
+      elseif spec_name =~# '^move-[npNP]$'
+        for lhs in spec_info
+          call s:map(banged_p, lhs, rhs)
+        endfor
+      elseif spec_name =~# '^select\(\|-[ai]\)$'
+        for lhs in spec_info
+          call s:objmap(banged_p, lhs, rhs)
+        endfor
+      else
+        throw printf('Unknown property: %s given to %s',
+        \            string(spec_name),
+        \            string(obj_name))
+      endif
+
+      unlet spec_info  " to avoid E706.
+    endfor
+  endfor
+
+  call s:define_failsafe_key_mappings(a:plugin_name, a:obj_specs)
 endfunction
 
 
@@ -246,6 +298,12 @@ function! s:range_containsp(range_head, range_tail, target_pos)
 endfunction
 
 
+function! s:range_in_linep(range_head, range_tail, target_pos)
+  return a:range_head[0] == a:target_pos[0]
+  \      || a:range_tail[0] == a:target_pos[0]
+endfunction
+
+
 function! s:range_no_text_without_edgesp(range_head, range_tail)
   let [hl, hc] = a:range_head
   let [tl, tc] = a:range_tail
@@ -312,20 +370,24 @@ endfunction
 " basics  "{{{3
 let s:plugin = {}
 
-function s:plugin.new(plugin_name, obj_specs)
+function! s:plugin.new(plugin_name, obj_specs)
   let _ = extend({'name': a:plugin_name, 'obj_specs': a:obj_specs},
   \              s:plugin, 'keep')
   call _.normalize()
   return _
 endfunction
 
-function s:plugin.normalize()
-  call self.normalize_property_names()
-  call self.normalize_property_values()
+function! s:plugin.normalize()
+  call s:normalize(self.obj_specs)
 endfunction
 
-function s:plugin.normalize_property_names()
-  for spec in values(self.obj_specs)
+function! s:normalize(obj_specs)
+  call s:normalize_property_names(a:obj_specs)
+  call s:normalize_property_values(a:obj_specs)
+endfunction
+
+function! s:normalize_property_names(obj_specs)
+  for spec in values(a:obj_specs)
     for old_prop_name in keys(spec)
       if old_prop_name =~ '^\*.*\*$'
         let new_prop_name = substitute(old_prop_name, '^\*\(.*\)\*$', '\1', '')
@@ -336,8 +398,8 @@ function s:plugin.normalize_property_names()
   endfor
 endfunction
 
-function s:plugin.normalize_property_values()
-  for [obj_name, specs] in items(self.obj_specs)
+function! s:normalize_property_values(obj_specs)
+  for [obj_name, specs] in items(a:obj_specs)
     for [spec_name, spec_info] in items(specs)
       if s:is_ui_property_name(spec_name)
         if type(spec_info) == type('')
@@ -359,6 +421,13 @@ function s:plugin.normalize_property_values()
         else
           " Nothing to do.
         endif
+      elseif spec_name ==# 'pattern'
+        if !has_key(specs, 'region-type')
+          let specs['region-type'] = 'v'
+        endif
+        if !has_key(specs, 'scan')
+          let specs['scan'] = 'forward'
+        endif
       endif
 
       unlet spec_info  " to avoid E706.
@@ -368,38 +437,23 @@ endfunction
 
 
 function! s:plugin.define_default_key_mappings(banged_p)  "{{{3
-  for [obj_name, specs] in items(self.obj_specs)
-    for [spec_name, spec_info] in items(specs)
-      let rhs = self.interface_mapping_name(obj_name, spec_name)
-      if s:is_non_ui_property_name(spec_name)
-        " ignore
-      elseif spec_name =~# '^move-[npNP]$'
-        for lhs in spec_info
-          call s:map(a:banged_p, lhs, rhs)
-        endfor
-      elseif spec_name =~# '^select\(\|-[ai]\)$'
-        for lhs in spec_info
-          call s:objmap(a:banged_p, lhs, rhs)
-        endfor
-      else
-        throw printf('Unknown property: %s given to %s',
-        \            string(spec_name),
-        \            string(obj_name))
-      endif
-
-      unlet spec_info  " to avoid E706.
-    endfor
-  endfor
+  call textobj#user#map(self.name, self.obj_specs, a:banged_p)
 endfunction
 
 
 function! s:plugin.define_interface_key_mappings()  "{{{3
-  let RHS_PATTERN = ':<C-u>call g:__textobj_' . self.name . '.%s'
-  \                 . '("%s", "%s", "<mode>")<Return>'
-  let RHS_FUNCTION = ':<C-u>call <SID>select_function_wrapper('
-  \                  .   'g:__textobj_' . self.name . '.obj_specs["%s"]["%s"],'
-  \                  .   '"<mode>"'
-  \                  . ')<Return>'
+  let RHS_PATTERN =
+  \   ':<C-u>call g:__textobj_' . self.name . '.do_by_pattern('
+  \ .   '"%s",'
+  \ .   '"%s",'
+  \ .   '"<mode>"'
+  \ . ')<Return>'
+  let RHS_FUNCTION =
+  \   ':<C-u>call g:__textobj_' . self.name . '.do_by_function('
+  \ .   '"%s",'
+  \ .   '"%s",'
+  \ .   '"<mode>"'
+  \ . ')<Return>'
 
   for [obj_name, specs] in items(self.obj_specs)
     for spec_name in filter(keys(specs), 's:is_ui_property_name(v:val)')
@@ -409,23 +463,9 @@ function! s:plugin.define_interface_key_mappings()  "{{{3
       " rhs
       let _ = spec_name . '-function'
       if has_key(specs, _)
-        let rhs = printf(RHS_FUNCTION, obj_name, _)
+        let rhs = printf(RHS_FUNCTION, spec_name, obj_name)
       elseif has_key(specs, 'pattern')
-        if spec_name =~# '^move-[npNP]$'
-          let flags = ''
-          let flags .= (spec_name =~# '[pP]$' ? 'b' : '')
-          let flags .= (spec_name =~# '[NP]$' ? 'e' : '')
-          let impl_fname = 'move'
-        elseif spec_name ==# 'select'
-          let flags = ''
-          let impl_fname = 'select'
-        elseif spec_name =~# '^select-[ai]$'
-          let flags = ''
-          let flags .= (spec_name =~# 'a$' ? 'a' : '')
-          let flags .= (spec_name =~# 'i$' ? 'i' : '')
-          let impl_fname = 'select_pair'
-        endif
-        let rhs = printf(RHS_PATTERN, impl_fname, obj_name, flags)
+        let rhs = printf(RHS_PATTERN, spec_name, obj_name)
       else
         " skip to allow to define user's own {rhs} of the interface mapping.
         continue
@@ -444,8 +484,13 @@ endfunction
 
 
 function! s:plugin.interface_mapping_name(obj_name, spec_name)  "{{{3
+  return s:interface_mapping_name(self.name, a:obj_name, a:spec_name)
+endfunction
+
+
+function! s:interface_mapping_name(plugin_name, obj_name, spec_name)  "{{{3
   let _ = printf('<Plug>(textobj-%s-%s-%s)',
-  \              self.name,
+  \              a:plugin_name,
   \              a:obj_name,
   \              substitute(a:spec_name, '^\(move\|select\)', '', ''))
   let _ = substitute(_, '-\+', '-', 'g')
@@ -454,21 +499,106 @@ function! s:plugin.interface_mapping_name(obj_name, spec_name)  "{{{3
 endfunction
 
 
-" "pattern" implementations  "{{{3
-function! s:plugin.move(obj_name, flags, previous_mode)
+" "pattern" wrappers  "{{{3
+function! s:plugin.do_by_pattern(spec_name, obj_name, previous_mode)
   let specs = self.obj_specs[a:obj_name]
-  call textobj#user#move(specs['pattern'], a:flags, a:previous_mode)
+  let flags = s:PATTERN_FLAGS_TABLE[a:spec_name]
+  \           . (a:spec_name =~# '^select' ? specs['region-type'] : '')
+  \           . (a:spec_name ==# 'select' ? specs['scan'][0] : '')
+  call {s:PATTERN_IMPL_TABLE[a:spec_name]}(
+  \   specs['pattern'],
+  \   flags,
+  \   a:previous_mode
+  \ )
 endfunction
 
-function! s:plugin.select(obj_name, flags, previous_mode)
-  let specs = self.obj_specs[a:obj_name]
-  call textobj#user#select(specs['pattern'], a:flags, a:previous_mode)
+let s:PATTERN_IMPL_TABLE = {
+\   'move-n': 's:move_wrapper',
+\   'move-N': 's:move_wrapper',
+\   'move-p': 's:move_wrapper',
+\   'move-P': 's:move_wrapper',
+\   'select': 'textobj#user#select',
+\   'select-a': 's:select_pair_wrapper',
+\   'select-i': 's:select_pair_wrapper',
+\ }
+
+let s:PATTERN_FLAGS_TABLE = {
+\   'move-n': '',
+\   'move-N': 'e',
+\   'move-p': 'b',
+\   'move-P': 'be',
+\   'select': '',
+\   'select-a': 'a',
+\   'select-i': 'i',
+\ }
+
+function! s:move_wrapper(patterns, flags, previous_mode)
+  " \x16 = CTRL-V
+  call textobj#user#move(
+  \   a:patterns,
+  \   substitute(a:flags, '[vV\x16]', '', 'g'),
+  \   a:previous_mode
+  \ )
 endfunction
 
-function! s:plugin.select_pair(obj_name, flags, previous_mode)
+function! s:select_pair_wrapper(patterns, flags, previous_mode)
+  call textobj#user#select_pair(
+  \   a:patterns[0],
+  \   a:patterns[1],
+  \   a:flags,
+  \   a:previous_mode
+  \ )
+endfunction
+
+
+" "*-function" wrappers  "{{{3
+function! s:plugin.do_by_function(spec_name, obj_name, previous_mode)
   let specs = self.obj_specs[a:obj_name]
-  call textobj#user#select_pair(specs['pattern'][0], specs['pattern'][1],
-  \                             a:flags, a:previous_mode)
+  call {s:FUNCTION_IMPL_TABLE[a:spec_name]}(
+  \   specs[a:spec_name . '-function'],
+  \   a:spec_name,
+  \   a:previous_mode
+  \ )
+endfunction
+
+let s:FUNCTION_IMPL_TABLE = {
+\   'move-n': 's:move_function_wrapper',
+\   'move-N': 's:move_function_wrapper',
+\   'move-p': 's:move_function_wrapper',
+\   'move-P': 's:move_function_wrapper',
+\   'select': 's:select_function_wrapper',
+\   'select-a': 's:select_function_wrapper',
+\   'select-i': 's:select_function_wrapper',
+\ }
+
+function! s:select_function_wrapper(function_name, spec_name, previous_mode)
+  let ORIG_POS = s:gpos_to_spos(getpos('.'))
+
+  let _ = function(a:function_name)()
+  if _ is 0
+    call s:cancel_selection(a:previous_mode, ORIG_POS)
+  else
+    let [motion_type, start_position, end_position] = _
+    call s:range_select(
+    \   s:gpos_to_spos(start_position),
+    \   s:gpos_to_spos(end_position),
+    \   motion_type
+    \ )
+  endif
+endfunction
+
+function! s:move_function_wrapper(function_name, spec_name, previous_mode)
+  let ORIG_POS = s:gpos_to_spos(getpos('.'))
+
+  let _ = function(a:function_name)()
+  if _ is 0
+    call cursor(ORIG_POS)
+  else
+    " FIXME: Support motion_type.  But unlike selecting a text object, the
+    " motion_type must be known before calling a user-given function.
+    let [motion_type, start_position, end_position] = _
+    call setpos('.', a:spec_name =~# '[np]$' ? start_position : end_position)
+  endif
 endfunction
 
 
@@ -503,25 +633,6 @@ function! s:objmap(forced_p, lhs, rhs)
 endfunction
 
 
-" "select-function" wrapper  "{{{3
-function! s:select_function_wrapper(function_name, previous_mode)
-  let ORIG_POS = s:gpos_to_spos(getpos('.'))
-  call s:prepare_selection(a:previous_mode)
-
-  let _ = function(a:function_name)()
-  if _ is 0
-    call s:cancel_selection(a:previous_mode, ORIG_POS)
-  else
-    let [motion_type, start_position, end_position] = _
-    call s:range_select(
-    \   s:gpos_to_spos(start_position),
-    \   s:gpos_to_spos(end_position),
-    \   motion_type
-    \ )
-  endif
-endfunction
-
-
 
 
 " Etc  "{{{2
@@ -538,12 +649,6 @@ function! s:prepare_movement(previous_mode)
   endif
 endfunction
 
-function! s:prepare_selection(previous_mode)
-  if a:previous_mode ==# 'v'
-    execute 'normal!' "gv\<Esc>"
-  endif
-endfunction
-
 
 function! s:cancel_selection(previous_mode, orig_pos)
   if a:previous_mode ==# 'v'
@@ -555,13 +660,14 @@ endfunction
 
 
 function! s:snr_prefix(sfile)
+  " :redir captures also 'verbose' messages.  Its result must be filtered.
   redir => result
   silent scriptnames
   redir END
 
   for line in split(result, '\n')
     let _ = matchlist(line, '^\s*\(\d\+\):\s*\(.*\)$')
-    if s:normalize_path(a:sfile) ==# s:normalize_path(_[2])
+    if !empty(_) && s:normalize_path(a:sfile) ==# s:normalize_path(_[2])
       return printf("\<SNR>%d_", _[1])
     endif
   endfor
@@ -572,6 +678,15 @@ endfunction
 
 function! s:normalize_path(unnormalized_path)
   return substitute(fnamemodify(a:unnormalized_path, ':p'), '\\', '/', 'g')
+endfunction
+
+
+function! s:choose_wise(flags)
+  return
+  \ a:flags =~# 'v' ? 'v' :
+  \ a:flags =~# 'V' ? 'V' :
+  \ a:flags =~# "\<C-v>" ? "\<C-v>" :
+  \ 'v'
 endfunction
 
 
@@ -625,6 +740,8 @@ let s:non_ui_property_names = [
 \   'move-n-function',
 \   'move-p-function',
 \   'pattern',
+\   'region-type',
+\   'scan',
 \   'select-a-function',
 \   'select-function',
 \   'select-i-function',
@@ -633,6 +750,30 @@ let s:non_ui_property_names = [
 
 function! s:is_non_ui_property_name(name)
   return 0 <= index(s:non_ui_property_names, a:name)
+endfunction
+
+
+function! s:define_failsafe_key_mappings(plugin_name, obj_specs)
+  for [obj_name, specs] in items(a:obj_specs)
+    for [spec_name, spec_info] in items(specs)
+      if !s:is_non_ui_property_name(spec_name)
+        let lhs = s:interface_mapping_name(a:plugin_name, obj_name, spec_name)
+        if maparg(lhs, 'v') == ''
+          let rhs = printf('<SID>fail(%s)',
+          \                string(substitute(lhs, '<', '<LT>', 'g')))
+          let mapf = spec_name =~# '^move-[npNP]$'
+          \          ? 's:noremap'
+          \          : 's:objnoremap'
+          call {mapf}(0, '<expr>' . lhs, rhs)
+        endif
+      endif
+      unlet spec_info  " to avoid E706.
+    endfor
+  endfor
+endfunction
+
+function! s:fail(interface_key_mapping_lhs)
+  throw printf('Text object %s is not defined', a:interface_key_mapping_lhs)
 endfunction
 
 

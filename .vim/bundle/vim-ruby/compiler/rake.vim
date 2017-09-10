@@ -22,12 +22,16 @@ CompilerSet errorformat=
       \%D(in\ %f),
       \%\\s%#from\ %f:%l:%m,
       \%\\s%#from\ %f:%l:,
-      \%\\s%##\ %f:%l:%m,
-      \%\\s%##\ %f:%l,
-      \%\\s%#[%f:%l:\ %#%m,
-      \%\\s%#%f:%l:\ %#%m,
+      \%\\s%##\ %f:%l:%m%\\&%.%#%\\D:%\\d%#:%.%#,
+      \%\\s%##\ %f:%l%\\&%.%#%\\D:%\\d%#,
+      \%\\s%#[%f:%l:\ %#%m%\\&%.%#%\\D:%\\d%#:%.%#,
+      \%\\s%#%f:%l:\ %#%m%\\&%.%#%\\D:%\\d%#:%.%#,
       \%\\s%#%f:%l:,
-      \%m\ [%f:%l]:
+      \%m\ [%f:%l]:,
+      \%+Erake\ aborted!,
+      \%+EDon't\ know\ how\ to\ build\ task\ %.%#,
+      \%+Einvalid\ option:%.%#,
+      \%+Irake\ %\\S%\\+%\\s%\\+#\ %.%#
 
 let &cpo = s:cpo_save
 unlet s:cpo_save

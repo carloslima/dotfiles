@@ -5,38 +5,49 @@ version 7.0
 set nocompatible               " be iMproved
 filetype off                   " required!
 
+set shell=/bin/bash
 set runtimepath+=~/.vim/bundle/vundle/
 call vundle#rc()
 
 " let Vundle manage Vundle
 " required! 
-Bundle 'gmarik/vundle'
+Plugin 'gmarik/vundle'
 
 " My Bundles here:
 "
 " original repos on github
-Bundle 'matchit.zip'
-Bundle 'tpope/vim-fugitive'
-Bundle 'c9s/perlomni.vim'
-Bundle 'kien/ctrlp.vim'
+Plugin 'matchit.zip'
+Plugin 'tpope/vim-fugitive'
+Plugin 'ctrlpvim/ctrlp.vim'
   map <Leader>t :CtrlPBuffer<CR>
   let g:ctrlp_map = '<C-t>'
   let g:ctrlp_working_path_mode = 0 " don’t manage working directory.
   let g:ctrlp_custom_ignore = {
-  \ 'dir':  '\v\c\.(git|svn)$|cgi/t/sandbox|cover_db',
+  \ 'dir':  '\v\c\.(git|svn)$|cover_db|vendor/',
   \ 'file': '\v\c\.(swf|bak|png|gif|mov|ico|jpg|pdf|jrxml)$',
   \ }
-Bundle 'Lokaltog/vim-powerline'
-  let g:Powerline_symbols = 'fancy'
-Bundle 'Lokaltog/vim-easymotion'
-Bundle 'mileszs/ack.vim'
-Bundle 'cakebaker/scss-syntax.vim'
-Bundle 'airblade/vim-gitgutter'
-  let g:gitgutter_sign_column_always = 1
+Plugin 'vim-airline/vim-airline'
+  let g:airline_powerline_fonts = 1
+  if !exists('g:airline_symbols')
+      let g:airline_symbols = {}
+  endif
+  let g:airline_left_sep = '⮀'
+  let g:airline_left_alt_sep = '⮁'
+  let g:airline_right_sep = '⮂'
+  let g:airline_right_alt_sep = '⮃'
+  let g:airline_symbols.branch = '⭠'
+  "let g:airline_symbols.branch = '⎇ '
+  let g:airline_symbols.readonly = '⭤'
+  let g:airline_symbols.linenr = '⭡'
+Plugin 'easymotion/vim-easymotion'
+Plugin 'airblade/vim-gitgutter'
+  set signcolumn=yes
   highlight clear SignColumn
-Bundle 'vim-ruby/vim-ruby'
-Bundle 'kana/vim-textobj-user'
-Bundle 'nelstrom/vim-textobj-rubyblock'
+Plugin 'vim-ruby/vim-ruby'
+Plugin 'kana/vim-textobj-user'
+Plugin 'nelstrom/vim-textobj-rubyblock'
+Plugin 'tpope/vim-markdown'
+Plugin 'kana/vim-textobj-lastpat'
 
 " vim-scripts repos
 "Bundle 'L9'
@@ -70,9 +81,11 @@ set list
 set listchars=tab:>-,trail:-
 set mouse=c
 set nowrap
+set nrformats=
 set number
 set ruler
 set scrolloff=5
+set shiftwidth=4
 set showcmd
 set showmatch
 set smarttab
@@ -85,6 +98,7 @@ syntax on
 
 highlight   CursorColumn  term=NONE    cterm=none ctermbg=232
 highlight   CursorLine    term=NONE    cterm=bold ctermbg=8
+highlight   ColorColumn   term=NONE    cterm=bold ctermbg=1
 highlight   FoldColumn                            ctermbg=8  ctermfg=14
 highlight   Folded                                ctermbg=8  ctermfg=14
 highlight   Search        term=reverse cterm=bold ctermbg=11 ctermfg=0
@@ -99,10 +113,17 @@ highlight   PmenuThumb                            ctermbg=7  ctermfg=0
 " :help last-position-jump
 autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
 
+inoremap <C-S> <ESC>:update<CR>a
+nnoremap <C-S> :update<CR>
 nnoremap <C-L> :noh<CR><C-L>
 inoremap jj <Esc>
+nnoremap <Leader><Leader>t :ClearAllCtrlPCaches<CR>
+
 nnoremap <Leader>r :source ~/.vimrc<CR>
 nnoremap <Leader><Leader>r :e ~/.vimrc<CR>
+" Ctrl P/N on Command Line mode (with filtering)
+cnoremap <C-N> <DOWN>
+cnoremap <C-P> <UP>
 
 map <Leader>gs :Gstatus<CR>
 map <Leader>gc :Gcommit<CR>
@@ -121,3 +142,11 @@ nmap <F1> <Esc>
 imap <F1> <Esc>
 
 autocmd FileType gitcommit autocmd! BufEnter COMMIT_EDITMSG call setpos('.', [0, 1, 1, 0])
+
+set colorcolumn=100,120
+
+if match($TERM, "screen-256color")!=-1
+  set term=xterm-256color
+elseif match($TERM, "screen")!=-1
+  set term=xterm
+endif
