@@ -29,7 +29,6 @@ Plugin 'ctrlpvim/ctrlp.vim'
 Plugin 'Lokaltog/vim-powerline'
   let g:Powerline_symbols = 'fancy'
 Plugin 'Lokaltog/vim-easymotion'
-Plugin 'cakebaker/scss-syntax.vim'
 Plugin 'airblade/vim-gitgutter'
   let g:gitgutter_sign_column_always = 1
   highlight clear SignColumn
