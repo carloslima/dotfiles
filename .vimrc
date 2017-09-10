@@ -18,7 +18,6 @@ Plugin 'gmarik/vundle'
 " original repos on github
 Plugin 'matchit.zip'
 Plugin 'tpope/vim-fugitive'
-Plugin 'c9s/perlomni.vim'
 Plugin 'kien/ctrlp.vim'
   map <Leader>t :CtrlPBuffer<CR>
   let g:ctrlp_map = '<C-t>'
@@ -30,7 +29,6 @@ Plugin 'kien/ctrlp.vim'
 Plugin 'Lokaltog/vim-powerline'
   let g:Powerline_symbols = 'fancy'
 Plugin 'Lokaltog/vim-easymotion'
-Plugin 'mileszs/ack.vim'
 Plugin 'cakebaker/scss-syntax.vim'
 Plugin 'airblade/vim-gitgutter'
   let g:gitgutter_sign_column_always = 1
@@ -39,7 +37,6 @@ Plugin 'vim-ruby/vim-ruby'
 Plugin 'kana/vim-textobj-user'
 Plugin 'nelstrom/vim-textobj-rubyblock'
 Plugin 'tpope/vim-markdown'
-Plugin 'rodjek/vim-puppet'
 Plugin 'kana/vim-textobj-lastpat'
 
 " vim-scripts repos
